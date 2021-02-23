@@ -1,45 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <link rel="stylesheet" href="theme.css"/>
+        <link rel="stylesheet" href="./theme.css"/>
         <meta charset="UTF-8">
         <title>PRIDE</title>
-        <meta http-equiv="Main" content="script-src 'self' 'unsafe-inline';"/>
     </head>
     <body>
-        <p>
-            Lansing, sleepless.<br>
-            Is this what you want<br>
-            or is this all you've got?<br>
-            You'll stray, and I'll pray<br>
-            but this is what you want<br>
-            'cause this is all we've got.<br>
-        </p>
-        <p>
-            Fade to the background<br>
-            and everything blurs all around<br>
-            it's nothing to write home about<br>
-            and I'm always getting down<br>
-            will you wait for me now?<br>
-            Will everything turn out?<br>
-        </p>
-        <p>
-            The old armoire lyric<br>
-            we're sewing seams and sharing spirits<br>
-            and I can barely hear it<br>
-            'cause everyone was overheated and I'll sway.<br>
-            These mannequins are looking homely<br>
-            and I'm feeling a little lonely<br>
-            fumbling with my house keys;<br>
-            the city's been hard on me.<br>
-        </p>
-        <p>
-            Lansing, sleepless.<br>
-            Is this what you want<br>
-            or is this all you've got?<br>
-            You'll stray, and I'll pray<br>
-            but this is what you want<br>
-            'cause this is all we've got.<br>
-        </p>
+        <textarea id="editor" rows="60", cols="200"></textarea>
+        <script>
+            const ctb = require('custom-electron-titlebar');
+            new ctb.Titlebar({
+                backgroundColor: ctb.Color.fromHex('#326AF1')
+            });
+        </script>
     </body>
 </html>

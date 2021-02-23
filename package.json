@@ -2,10 +2,10 @@
   "name": "PRIDE",
   "version": "1.0.0",
   "description": "Official Prole Industries IDE",
-  "main": "main.js",
+  "main": "process.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron-forge start",
+    "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
@@ -29,6 +29,7 @@
     "electron": "^11.3.0"
   },
   "dependencies": {
+    "custom-electron-titlebar": "^3.2.6",
     "electron-squirrel-startup": "^1.0.0"
   },
   "config": {
