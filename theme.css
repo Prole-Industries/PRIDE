@@ -1,0 +1,8 @@
+@font-face {font-family: Source Code Pro; src: url('resources/SourceCodePro-Regular.ttf'); }
+
+body{
+    font-family: Source Code Pro;
+    font-size: 14px;
+    color: #FFFFFF;
+    background-color: #252525;
+}
