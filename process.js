@@ -1,14 +1,16 @@
 const { app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
-const common = require('./common');
+const common = require('./common.js');
+const renderer = require('./renderer.js');
 
 const isMac = process.platform === "darwin";
-let mainwindow;
+
+var mainwindow;
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1080,
+    height: 720,
     frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -16,6 +18,7 @@ function createWindow () {
       nodeIntegration: true
     }
   });
+
   Menu.setApplicationMenu(common.menu);
   win.loadFile('main.html');
 }

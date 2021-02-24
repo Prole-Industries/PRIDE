@@ -30,7 +30,9 @@
   },
   "dependencies": {
     "custom-electron-titlebar": "^3.2.6",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "monaco-editor-electron": "^1.0.6",
+    "monaco-loader": "^1.0.0"
   },
   "config": {
     "forge": {

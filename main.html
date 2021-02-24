@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link rel="stylesheet" href="./theme.css"/>
-        <meta charset="UTF-8">
-        <title>PRIDE</title>
-    </head>
-    <body>
-        <textarea id="editor" rows="50", cols="140"></textarea>
-        <script>
-            const ctb = require('custom-electron-titlebar');
 
-            let titlebar = new ctb.Titlebar({
-                backgroundColor: ctb.Color.fromHex('#800000')
-            });
-            titlebar.updateTitle("PRIDE");
-        </script>
-    </body>
+<head>
+    <link rel="stylesheet" href="./theme.css" />
+    <meta charset="UTF-8">
+    <title>PRIDE</title>
+</head>
+
+<body>
+    <div id="editor" class="editor">
+
+    </div>
+</body>
+<script>
+    const ctb = require('custom-electron-titlebar');
+
+    var titlebar = new ctb.Titlebar({
+        backgroundColor: ctb.Color.fromHex('#800000')
+    });
+    titlebar.updateTitle("PRIDE");
+</script>
+<script>require('./renderer.js')</script>
+
 </html>

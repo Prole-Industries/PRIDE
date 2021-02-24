@@ -1,8 +1,29 @@
+@import 'bourbon';
+
 @font-face {font-family: Source Code Pro; src: url('resources/SourceCodePro-Regular.ttf'); }
+
+:root{
+    --darkgrey:#252525;
+    --midgrey: #1B1B1B;
+}
 
 body{
     font-family: Source Code Pro;
     font-size: 14px;
-    color: #FFFFFF;
-    background-color: #252525;
+    color: whitesmoke;
+    background-color: var(--darkgrey);
+    overflow-x: hidden;
+}
+
+div.editor{
+    resize: none;
+    position: relative;
+    display: inline-block;
+    left: 20px;
+    top: 60px;
+    height: 90%;
+    width: 80%;
+
+    color: whitesmoke;
+    background-color: var(--midgrey);
 }
