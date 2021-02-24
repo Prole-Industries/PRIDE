@@ -6,12 +6,14 @@
         <title>PRIDE</title>
     </head>
     <body>
-        <textarea id="editor" rows="60", cols="200"></textarea>
+        <textarea id="editor" rows="50", cols="140"></textarea>
         <script>
             const ctb = require('custom-electron-titlebar');
-            new ctb.Titlebar({
-                backgroundColor: ctb.Color.fromHex('#326AF1')
+
+            let titlebar = new ctb.Titlebar({
+                backgroundColor: ctb.Color.fromHex('#800000')
             });
+            titlebar.updateTitle("PRIDE");
         </script>
     </body>
 </html>

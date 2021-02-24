@@ -16,7 +16,7 @@ function createWindow () {
       nodeIntegration: true
     }
   });
-  //Menu.setApplicationMenu(common.menu);
+  Menu.setApplicationMenu(common.menu);
   win.loadFile('main.html');
 }
 
