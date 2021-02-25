@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="./theme.css" />
+    <meta charset="UTF-8">
+    <title>PRIDE</title>
+</head>
+<body>
+    <div id="editor" class="editor"></div>
+</body>
+
+<!-- You can't have the title bar in renderer.js because screw you, that's why (it's proper annoying) -->
+<!-- Titlebar -->
+<script>
+    const ctb = require('custom-electron-titlebar');
+
+    var titlebar = new ctb.Titlebar({
+        backgroundColor: ctb.Color.fromHex('#800000')
+    });
+    titlebar.updateTitle("PRIDE");
+
+    
+</script>
+<!-- This does a load of stuff for the editor -->
+<script>
+    const {remote} = require('electron');
+    const loader = require('monaco-loader');
+    const fileManager = require('./fileManager');
+
+    //monaco.editor.defineTheme('pride')
+
+    loader().then((monaco) => {
+        var editor = monaco.editor.create(document.getElementById('editor'), {
+            lineNumbers: true,
+            scrollBeyondLastLine: false,
+            theme: 'vs-dark'
+        });
+
+        window.addEventListener('resize', () => {
+            editor.layout();
+            editor.layout(); //We do this twice because in maximising it doesn't resize perfectly - but this fixes it (maybe make this better if you can though)
+        });
+
+        var fm = new fileManager({editor, monaco});
+        remote.getCurrentWindow().show();
+    });
+</script>
+</html>

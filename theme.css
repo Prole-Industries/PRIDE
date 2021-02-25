@@ -1,10 +1,9 @@
-@import 'bourbon';
-
 @font-face {font-family: Source Code Pro; src: url('resources/SourceCodePro-Regular.ttf'); }
 
 :root{
     --darkgrey:#252525;
     --midgrey: #1B1B1B;
+    overflow: hidden;
 }
 
 body{
@@ -12,7 +11,6 @@ body{
     font-size: 14px;
     color: whitesmoke;
     background-color: var(--darkgrey);
-    overflow-x: hidden;
 }
 
 div.editor{
@@ -21,7 +19,7 @@ div.editor{
     display: inline-block;
     left: 20px;
     top: 60px;
-    height: 90%;
+    height: 85%;
     width: 80%;
 
     color: whitesmoke;

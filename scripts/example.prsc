@@ -1,0 +1,23 @@
+output("hello world");
+var name = input("what's your name? ");
+output($"hello {name}");
+
+var a = 69;
+a++;
+if(a == 70){
+    output("aight cool it's 70");
+}
+
+class person{
+    public prop name;
+    public func getName(){
+        output(self.name);
+    }
+    
+    person(var name){
+        self.name = name;
+    }
+}
+
+var me = person(name);
+me.getName();
