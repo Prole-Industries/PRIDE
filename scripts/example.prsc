@@ -1,3 +1,8 @@
+//example code of Prolescript
+/*
+and heres a multiline comment
+*/
+
 output("hello world");
 var name = input("what's your name? ");
 output($"hello {name}");
@@ -9,7 +14,7 @@ if(a == 70){
 }
 
 class person{
-    public prop name;
+    public var name;
     public func getName(){
         output(self.name);
     }

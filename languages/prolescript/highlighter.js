@@ -1,89 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
+const loader = require('monaco-loader');
 
-<head>
-    <link rel="stylesheet" href="./theme.css" />
-    <meta charset="UTF-8">
-    <title>PRIDE</title>
-</head>
-<body>
-    <div id="editor" class="editor"></div>
-</body>
-
-<!-- You can't have the title bar in renderer.js because screw you, that's why (it's proper annoying) -->
-<!-- Titlebar -->
-<script>
-    const ctb = require('custom-electron-titlebar');
-
-    var titlebar = new ctb.Titlebar({
-        backgroundColor: ctb.Color.fromHex('#800000')
-    });
-    titlebar.updateTitle("PRIDE");
-</script>
-
-<!-- This does a load of stuff for the editor -->
-<script>
-    const {remote} = require('electron');
-    const fileManager = require('./fileManager');
-    const loader = require('monaco-loader')
-    const highlighter = require('./languages/prolescript/highlighter');
-
+async function main(){
     loader().then((monaco) => {
         monaco.editor.defineTheme('pride', {
             base: 'vs-dark', // can also be vs-dark or hc-black
             rules: [
-                { token: '',            background: '272727' }, //Sets the background colour of the minimap
-                { token: 'comment',     foreground: '008800', fontStyle: 'italic' },
-                { token: 'identifier',  foreground: 'ffffff' },
-                { token: 'type',        foreground: '0088ff' },
-                { token: 'string',      foreground: 'aa8800' },
-                { token: 'number',      foreground: 'ff0088' },
-                { token: 'method',      foreground: '00ff77' },
-                { token: 'class',       foreground: '00ffaa' },
-                { token: 'punctuation', foreground: 'cdcdcd' },
-                { token: 'keyword',     foreground: '6666ee' },
-                { token: 'invalid',     foreground: 'ff3333' }
+                { token: 'comment', foreground: '008800', fontStyle: 'italic' },
+                { token: 'identifier', foreground: 'f0f0f0' },
+                { token: 'keyword', foreground: '00ffff' },
+                { token: 'type', foreground: '569cd6' },
+                { token: 'string', foreground: 'aa8800'},
+                { token: 'number', foreground: 'ff0088'},
+                { token: 'method', foreground: '00ffcc'},
+                { token: 'class', foreground: '00ffaa'},
+                { token: 'punctuation', foreground: 'cdcdcd'}
             ]
         });
-
+        
         monaco.languages.register({id: "prolescript"});
         monaco.languages.setMonarchTokensProvider("prolescript", {
             defaultToken: 'invalid',
             tokenPostfix: '.prsc',
-
+        
             keywords: [
-            'for', 'foreach', 'while', 'if', 'elif', 'else', 'switch', 'case',
-            'try', 'except', 'finally', 'class', 'public', 'private', 'return',
-            'throw', 'break', 'in', 'true', 'false', 'null', 'import', 'self'
+              'for', 'foreach', 'while', 'if', 'elif', 'else', 'switch', 'case',
+              'try', 'except', 'finally', 'class', 'func', 'public', 'private', 'return',
+              'throw', 'break', 'in', 'true', 'false', 'null', 'import', 'self'
             ],
-
+        
             typeKeywords: [
-                'var', 'obj', 'list', 'dict', 'func'
+                'var', 'obj', 'list', 'dict'
             ],
-
+        
             operators: [
-            '=', '+=', '-=', '*=', '/=', '%=', '^=', '++', '--', '+', '-', '*', '/', '%', '^',
-            '==', '!=', '<', '>', '<=', '>=', '!', 'and', 'or', 'xor'
+              '=', '+=', '-=', '*=', '/=', '%=', '^=', '++', '--', '+', '-', '*', '/', '%', '^',
+              '==', '!=', '<', '>', '<=', '>=', '!', 'and', 'or', 'xor'
             ],
-
+        
             // we include these common regular expressions
             symbols: /[=><!~?:&|+\-*\/\^%]+/,
             escapes: /\\(?:[abfnrtv\\"'])/,
-
+        
             // The main tokenizer for our languages
             tokenizer: {
                 root: [
                     { include: 'common' }
                 ],
-
+        
                 common : [
                     { include: 'whitespace' },
-
+        
                     [/"([^"\\]|\\.)*$/, 'string.invalid'],  // non-teminated string
                     [/'([^'\\]|\\.)*$/, 'string.invalid'],  // non-teminated string
                     [/"/, 'string', '@string_double'],
                     [/'/, 'string', '@string_single'],
-
+        
                     [/[,.<>!?"\+\-/*^\\|$&:;=()\[\]{}]/, 'punctuation'],
                     [/\d+(\.?(\d+))/, 'number'],
                     [/[A-Za-z_][A-Za-z_0-9]*(?=\.)/, 'class'],
@@ -94,40 +65,40 @@
                         '@default': 'identifier'
                     }}],
                 ],
-
+        
                 whitespace: [
                     [/[ \t\r\n]+/, ''],
                     [/\/\*\*(?!\/)/, 'comment.doc', '@proledoc'],
                     [/\/\*/, 'comment', '@comment'],
                     [/\/\/.*$/, 'comment'],
                 ],
-
+        
                 comment: [
                     [/[^\/*]+/, 'comment'],
                     [/\*\//, 'comment', '@pop'],
                     [/[\/*]/, 'comment']
                 ],
-
+        
                 proledoc: [
                     [/[^\/*]+/, 'comment.doc'],
                     [/\*\//, 'comment.doc', '@pop'],
                     [/[\/*]/, 'comment.doc']
                 ],
-
+        
                 string_double: [
                     [/[^\\"]+/, 'string'],
                     [/@escapes/, 'string.escape'],
                     [/\\./, 'string.escape.invalid'],
                     [/"/, 'string', '@pop']
                 ],
-
+        
                 string_single: [
                     [/[^\\']+/, 'string'],
                     [/@escapes/, 'string.escape'],
                     [/\\./, 'string.escape.invalid'],
                     [/'/, 'string', '@pop']
                 ],
-
+        
                 bracketCounting: [
                     [/\{/, 'delimiter.bracket', '@bracketCounting'],
                     [/\}/, 'delimiter.bracket', '@pop'],
@@ -135,21 +106,7 @@
                 ],
             }
         });
-
-        var editor = monaco.editor.create(document.getElementById("editor"), {
-            language: 'prolescript',
-            theme: 'pride',
-            lineNumbers: true,
-            scrollBeyondLastLine: false,
-        });
-
-        window.addEventListener('resize', () => {
-            editor.layout();
-            editor.layout(); //We do this twice because in maximising it doesn't resize perfectly - but this fixes it (maybe make this better if you can though)
-        });
-
-        var fm = new fileManager({editor, monaco});
-        remote.getCurrentWindow().show();
     });
-</script>
-</html>
+}
+
+module.exports = main;

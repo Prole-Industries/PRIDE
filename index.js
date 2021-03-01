@@ -50,10 +50,6 @@ const createWindow = () => {
                 mainWindow.setFullScreen(!mainWindow.fullScreen);
               }
             },
-            // {
-            //   label: "Exit",
-            //   role: "quit"
-            // }
           ]
         },
         {
