@@ -8,6 +8,9 @@
 </head>
 <body>
     <div id="editor" class="editor"></div>
+    <div id="utils" class="utils">
+        <textarea readonly id="filepath"></textarea>
+    </div>
 </body>
 
 <!-- You can't have the title bar in renderer.js because screw you, that's why (it's proper annoying) -->
@@ -34,7 +37,7 @@
             rules: [
                 { token: '',            background: '272727' }, //Sets the background colour of the minimap
                 { token: 'comment',     foreground: '008800', fontStyle: 'italic' },
-                { token: 'identifier',  foreground: 'ffffff' },
+                { token: 'identifier',  foreground: 'a0a0a0' },
                 { token: 'type',        foreground: '0088ff' },
                 { token: 'string',      foreground: 'aa8800' },
                 { token: 'number',      foreground: 'ff0088' },
@@ -85,9 +88,12 @@
                     [/'/, 'string', '@string_single'],
 
                     [/[,.<>!?"\+\-/*^\\|$&:;=()\[\]{}]/, 'punctuation'],
-                    [/\d+(\.?(\d+))/, 'number'],
+                    [/\d+(\.?(\d+))*/, 'number'],
                     [/[A-Za-z_][A-Za-z_0-9]*(?=\.)/, 'class'],
-                    [/[A-Za-z_][A-Za-z_0-9]*(?=\()/, 'method'],
+                    [/[A-Za-z_][A-Za-z_0-9]*(?=\()/, {cases: {
+                        '@keywords': 'keyword',
+                        '@default': 'method'
+                    }}],
                     [/[A-Za-z_][A-Za-z_0-9]*/, {cases: {
                         '@typeKeywords': 'type',
                         '@keywords': 'keyword',
@@ -136,7 +142,7 @@
             }
         });
 
-        var editor = monaco.editor.create(document.getElementById("editor"), {
+        document.editor = monaco.editor.create(document.getElementById("editor"), {
             language: 'prolescript',
             theme: 'pride',
             lineNumbers: true,
@@ -152,4 +158,7 @@
         remote.getCurrentWindow().show();
     });
 </script>
+
+<!-- connect to renderer -->
+<script src="index.js"></script>
 </html>

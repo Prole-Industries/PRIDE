@@ -15,13 +15,37 @@ body{
 
 div.editor{
     resize: none;
-    position: relative;
+    position: absolute;
     display: inline-block;
-    left: 20px;
-    top: 60px;
-    height: 85%;
+    left: 2.5%;
+    top: 2.5%;
+    height: 80%;
     width: 80%;
 
+    color: whitesmoke;
+    background-color: var(--midgrey);
+}
+
+div.utils{
+    resize: none;
+    position: relative;
+    display: inline-block;
+    left: 2.5%;
+    top: 85%;
+
+    width: 80%;
+}
+
+textarea{
+    resize: none;
+    position: relative;
+    height: 20px;
+    width: 90%;
+
+    flex-wrap: nowrap;
+    font-family: Source Code Pro;
+    vertical-align: middle;
+    
     color: whitesmoke;
     background-color: var(--midgrey);
 }

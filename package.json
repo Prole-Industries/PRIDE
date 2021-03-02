@@ -2,7 +2,7 @@
   "name": "PRIDE",
   "version": "1.0.0",
   "description": "Official Prole Industries IDE",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
     "package": "electron-forge package",
