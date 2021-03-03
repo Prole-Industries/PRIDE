@@ -10,6 +10,7 @@
     <div id="editor" class="editor"></div>
     <div id="utils" class="utils">
         <textarea readonly id="filepath"></textarea>
+        <script>var filepath = document.getElementById("filepath");</script>
     </div>
 </body>
 
@@ -28,10 +29,34 @@
     ipcRenderer.send("CONNECTR");
 
     ipcRenderer.on("openFile", (event, arg) => {
-        remote.dialog.showOpenDialog({properties: ['openFile']}).then((filepath) => {
-            document.getElementById("filepath").innerText = filepath.filePaths[0];
-        });
+        openFile();
     });
+
+    function openFile()
+    {
+        remote.dialog.showOpenDialog({properties: ['openFile']}).then((filepath) => {
+            let path = filepath.filePaths[0];
+            fs.readFile(path, 'utf-8', (err, data) => {
+                editor.getModel().setValue(data);
+            });
+            filepath.innerText = path;
+        });
+    }
+
+    function saveFile(saveas)
+    {
+        let code =  editor.getModel().getValue();
+        let path;
+        if(saveas){
+            path = remote.dialog.showSaveDialog();
+        } else {
+            path = filepath.innerText;
+            if(path[-1] == "*") path = path.substring(0, -1);
+        }
+        fs.writeFile(path, 'utf-8');
+        filepath.innerText = path;
+    }
+
 </script>
 
 <!-- This does a load of stuff for the editor -->
@@ -39,6 +64,8 @@
     const fileManager = require('./fileManager');
     const loader = require('monaco-loader')
     const highlighter = require('./languages/prolescript/highlighter');
+
+    var editor;
 
     loader().then((monaco) => {
         monaco.editor.defineTheme('pride', {
@@ -54,7 +81,8 @@
                 { token: 'class',       foreground: '00ffaa' },
                 { token: 'punctuation', foreground: 'cdcdcd' },
                 { token: 'keyword',     foreground: '6666ee' },
-                { token: 'invalid',     foreground: 'ff3333' }
+                { token: 'operator',    foreground: '00ffff' },
+                { token: 'invalid',     foreground: 'ff3333' },
             ]
         });
 
@@ -161,6 +189,10 @@
         window.addEventListener('resize', () => {
             editor.layout();
             editor.layout(); //We do this twice because in maximising it doesn't resize perfectly - but this fixes it (maybe make this better if you can though)
+        });
+
+        editor.onDidChangeModelContent((event) => {
+            filepath.innerText += "*";
         });
 
         var fm = new fileManager({editor, monaco});

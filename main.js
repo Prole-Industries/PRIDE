@@ -12,7 +12,7 @@ let isMac = process.platform === 'darwin';
 
 let renderer;
 ipcMain.on("CONNECTR", (event) => {
-    renderer = event;
+    renderer = event.sender;
 });
 
 const createWindow = () => {
@@ -35,19 +35,24 @@ const createWindow = () => {
             submenu: [
             {
                 label: "New",
-                accelerator: "CmdOrCtrl+N"
+                accelerator: "CmdOrCtrl+N",
+                click: () => {
+
+                }
             },
             {
                 label: "Open",
                 accelerator: "CmdOrCtrl+O",
                 click: () => {
-                    console.log("entry");
-                    renderer.sender.send("openFile");
+                    renderer.send("openFile");
                 }
             },
             {
                 label: "Save",
-                accelerator: "CmdOrCtrl+S"
+                accelerator: "CmdOrCtrl+S",
+                click: () => {
+                    renderer.send("saveFile");
+                }
             },
             {
                 label: "Save As",
@@ -120,9 +125,6 @@ const createWindow = () => {
                     mainWindow.webContents.openDevTools();
                 }
             },
-            // {
-
-            // },
             ]
         },
         {
