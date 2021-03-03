@@ -1,6 +1,6 @@
 //These are the main processes
 
-const {BrowserWindow, Menu, app, remote, dialog} = require('electron');
+const { BrowserWindow, Menu, app, dialog, ipcMain, ipcRenderer, remote} = require('electron');
 const fs = require('fs');
 
 //Keeps a global reference of the window so it doesn't get yoten by the binman
@@ -9,6 +9,11 @@ let menuBar;
 
 //Because Apple never do things easy, we should keep an eye out to check if we're running on OSX
 let isMac = process.platform === 'darwin';
+
+let renderer;
+ipcMain.on("CONNECTR", (event) => {
+    renderer = event;
+});
 
 const createWindow = () => {
     //Create browser window
@@ -24,92 +29,107 @@ const createWindow = () => {
     });
 
     //Prep the titlebar
-  Menu.setApplicationMenu(Menu.buildFromTemplate([
-    {
-        label: "File",
-        submenu: [
+    Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
-            label: "New",
-            accelerator: "CmdOrCtrl+N"
+            label: "File",
+            submenu: [
+            {
+                label: "New",
+                accelerator: "CmdOrCtrl+N"
+            },
+            {
+                label: "Open",
+                accelerator: "CmdOrCtrl+O",
+                click: () => {
+                    console.log("entry");
+                    renderer.sender.send("openFile");
+                }
+            },
+            {
+                label: "Save",
+                accelerator: "CmdOrCtrl+S"
+            },
+            {
+                label: "Save As",
+                accelerator: "CmdOrCtrl+Shift+S"
+            },
+            {type: "separator"},
+            {
+                label: "Fullscreen",
+                accelerator: "F11"
+            },
+            ]
         },
         {
-            label: "Open",
-            accelerator: "CmdOrCtrl+O"
+            label: "Edit",
+            submenu: [
+            {
+                label: "Undo",
+                role: "undo",
+                accelerator: "CmdOrCtrl+Z"
+            },
+            {
+                label: "Redo",
+                role: "redo",
+                accelerator: "CmdOrCtrl+Shift+Z"
+            },
+            {type: "separator"},
+            {
+                label: "Cut",
+                role: "cut",
+                accelerator: "CmdOrCtrl+X"
+            },
+            {
+                label: "Copy",
+                role: "copy",
+                accelerator: "CmdOrCtrl+C"
+            },
+            {
+                label: "Paste",
+                role: "paste",
+                accelerator: "CmdOrCtrl+V"
+            },
+            ]
         },
         {
-            label: "Save",
-            accelerator: "CmdOrCtrl+S"
+            label: "Options",
+            submenu: [
+            {
+                label: "Options Menu",
+                accelerator: "CmdOrCtrl+Alt+M"
+            },
+            {type: "separator"},
+            {
+                label: "Help",
+                accelerator: "CmdOrCtrl+?"
+            },
+            {
+                label: "Docs",
+                accelerator: "CmdOrCtrl+Alt+D"
+            },
+            {type: "separator"},
+            {
+                label: "Reload",
+                role: "reload",
+                accelerator: "CmdOrCtrl+R"
+            },
+            {
+                label: "Devtools",
+                accelerator: "F12",
+                click: () => {
+                    mainWindow.webContents.openDevTools();
+                }
+            },
+            // {
+
+            // },
+            ]
         },
         {
-            label: "Save As",
-            accelerator: "CmdOrCtrl+Shift+S"
-        },
-        {type: "separator"},
-        {
-            label: "Fullscreen",
-            accelerator: "F11"
-        },
-        ]
-    },
-    {
-        label: "Edit",
-        submenu: [
-        {
-            label: "Undo",
-            role: "undo",
-            accelerator: "CmdOrCtrl+Z"
-        },
-        {
-            label: "Redo",
-            role: "redo",
-            accelerator: "CmdOrCtrl+Shift+Z"
-        },
-        {type: "separator"},
-        {
-            label: "Cut",
-            role: "cut",
-            accelerator: "CmdOrCtrl+X"
-        },
-        {
-            label: "Copy",
-            role: "copy",
-            accelerator: "CmdOrCtrl+C"
-        },
-        {
-            label: "Paste",
-            role: "paste",
-            accelerator: "CmdOrCtrl+V"
-        },
-        ]
-    },
-    {
-        label: "Options",
-        submenu: [
-        {
-            label: "Options Menu",
-            accelerator: "CmdOrCtrl+Alt+M"
-        },
-        {type: "separator"},
-        {
-            label: "Help",
-            accelerator: "CmdOrCtrl+?"
-        },
-        {
-            label: "Docs",
-            accelerator: "CmdOrCtrl+Alt+D"
-        },
-        {
-            label: "Reload",
-            role: "reload",
-            accelerator: "CmdOrCtrl+R"
+            label: "Compile",
+            accelerator: "F5"
         }
-        ]
-    },
-    {
-        label: "Compile",
-        accelerator: "F5"
-    }
-  ]));
+    ]));
 
     //Open the main splash screen
     mainWindow.loadFile('index.html');
@@ -118,6 +138,7 @@ const createWindow = () => {
 //Called after initialisation, we're ready to make windows
 app.whenReady().then(() => {
     createWindow();
+    
 });
 
 //Quit when all windows are closed if it's OSX
