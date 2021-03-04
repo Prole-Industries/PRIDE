@@ -56,7 +56,10 @@ const createWindow = () => {
             },
             {
                 label: "Save As",
-                accelerator: "CmdOrCtrl+Shift+S"
+                accelerator: "CmdOrCtrl+Shift+S",
+                click: () => {
+                    renderer.send("saveFileAs");
+                }
             },
             {type: "separator"},
             {

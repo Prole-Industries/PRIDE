@@ -21,6 +21,10 @@
     const { ipcRenderer, Menu, remote } = require('electron');
     const fs = require('fs');
 
+    var debug = {};
+
+    var isopening = false;  //We use this flag so that when we open a file, it doesn't get changed to * by the editor change detector.
+
     var titlebar = new ctb.Titlebar({
         backgroundColor: ctb.Color.fromHex('#800000')
     });
@@ -32,31 +36,56 @@
         openFile();
     });
 
+    ipcRenderer.on("saveFile", (event, arg) => {
+        saveFile();
+    });
+
+    ipcRenderer.on("saveFileAs", (event, arg) => {
+        saveFileAs();
+    });
+
     function openFile()
     {
-        remote.dialog.showOpenDialog({properties: ['openFile']}).then((filepath) => {
-            let path = filepath.filePaths[0];
+        isopening = true;
+        remote.dialog.showOpenDialog({properties: ['openFile']}).then((fpath) => {
+            let path = fpath.filePaths[0];
             fs.readFile(path, 'utf-8', (err, data) => {
+                if(err) throw err;
                 editor.getModel().setValue(data);
             });
-            filepath.innerText = path;
+            filepath.innerHTML = path;
         });
     }
 
-    function saveFile(saveas)
+    function saveFileAs()
     {
-        let code =  editor.getModel().getValue();
-        let path;
-        if(saveas){
-            path = remote.dialog.showSaveDialog();
-        } else {
-            path = filepath.innerText;
-            if(path[-1] == "*") path = path.substring(0, -1);
-        }
-        fs.writeFile(path, 'utf-8');
-        filepath.innerText = path;
+        let code = editor.getModel().getValue();
+        let path = remote.dialog.showSaveDialog();
+
+        if(path === undefined) return;
+
+        if(fs.exists(path)) {fs.open(path, 'w', (err) => {}); debug.exists = false;} 
+        fs.writeFile(path, code, (err) => {
+            if(err) throw err;
+            debug.saveFileOp = {path, code, err}
+        });
+        filepath.innerHTML = path;
     }
 
+    function saveFile()
+    {
+        let code = editor.getModel().getValue();
+        let path = filepath.innerHTML;
+        if(path.charAt(filepath.innerHTML.length-1) == "*") path = path.substring(0, filepath.innerHTML.length-1);
+        if(path == ""){
+            saveFileAs();
+            return;
+        }
+        fs.writeFile(path, code, (err) => {
+            if(err) throw err;
+        });
+        filepath.innerHTML = path;
+    }
 </script>
 
 <!-- This does a load of stuff for the editor -->
@@ -192,7 +221,10 @@
         });
 
         editor.onDidChangeModelContent((event) => {
-            filepath.innerText += "*";
+            if(isopening) isopening = false;
+            else{
+                if(filepath.innerHTML.charAt(filepath.innerHTML.length-1) != "*") filepath.innerHTML += "*";
+            }
         });
 
         var fm = new fileManager({editor, monaco});
