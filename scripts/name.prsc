@@ -1,0 +1,2 @@
+var name = "johann";
+output(name);

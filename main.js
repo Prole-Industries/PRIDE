@@ -21,6 +21,7 @@ const createWindow = () => {
         width: 1080,
         height: 720,
         frame: false,
+        icon: "resources/icon.png",
         titleBarStyle: 'hidden',
         webPreferences: {
             enableRemoteModule: true,
@@ -37,7 +38,7 @@ const createWindow = () => {
                 label: "New",
                 accelerator: "CmdOrCtrl+N",
                 click: () => {
-
+                    renderer.send("newFile");
                 }
             },
             {

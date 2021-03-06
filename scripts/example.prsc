@@ -26,5 +26,3 @@ class person{
 
 var me = person(name);
 me.getName();
-
-//checc
