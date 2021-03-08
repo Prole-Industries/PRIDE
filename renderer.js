@@ -1,6 +1,8 @@
 const ctb = require('custom-electron-titlebar');
-const { ipcRenderer, Menu, remote } = require('electron');
+const { ipcRenderer, Menu, remote, Main, dialog } = require('electron');
 const fs = require('fs');
+const loader = require('monaco-loader');
+const { resolve } = require('path');
 
 var debug = {};
 
@@ -11,9 +13,10 @@ var titlebar = new ctb.Titlebar({
 });
 titlebar.updateTitle("PRIDE");
 
-ipcRenderer.send("CONNECTR");
+ipcRenderer.send("CONNECTR");   //Send out an ipc call to be received by the main process - main process will use this to set a reference to the renderer.
 
-ipcRenderer.on("newFile", (event, arg) => {
+//These connect the signals sent by the main process to methods in the renderers
+ipcRenderer.on("newFile", async (event, arg) => {
     newFile();
 });
 
@@ -29,24 +32,31 @@ ipcRenderer.on("saveFileAs", (event, arg) => {
     saveFileAs();
 });
 
-function newFile() {
-    if(filepath.innerHTML.charAt(filepath.innerHTML.length - 1) == "*"){
-        let response = remote.dialog.showMessageBox(null, {
-            type: 'question',
+function clearEditor(){
+    editor.getModel().setValue("");
+    filepath.innerHTML = "";
+}
+
+async function newFile() {
+    if (filepath.innerHTML.charAt(filepath.innerHTML.length - 1) == "*") {
+        await remote.dialog.showMessageBox(null, {
+            type: 'warning',
             buttons: ['Yes', 'No', 'Cancel'],
             defaultId: 2,
             title: 'PRIDE',
             message: 'You have unsaved changes, do you want to save this file before creating a new file?',
-        }).then((_response)=> {
+        }).then(async (_response) => {
             let response = _response.response;
 
-            switch(response){
+            switch (response) {
                 case 0:
-                    saveFile();
+                    await saveFile();
                     break;
                 case 2:
                     return;
             }
+
+            clearEditor();
         });
     }
 }
@@ -64,42 +74,45 @@ function openFile() {
 }
 
 function saveFileAs() {
-    let code = editor.getModel().getValue();
-    remote.dialog.showSaveDialog().then((fpath) => {
-        let path = fpath.filePath;
+    return new Promise(async (resolve, reject) => {
+        let code = editor.getModel().getValue();
+        await remote.dialog.showSaveDialog().then(async (fpath) => {
+            let path = fpath.filePath;
 
-        fs.writeFile(path, code, (err) => {
-            if (err) throw err;
+            await fs.writeFile(path, code, (err) => {
+                if (err) throw err;
+            });
         });
-        filepath.innerHTML = path;
+        return resolve();
     });
 }
 
 function saveFile() {
-    let code = editor.getModel().getValue();
-    let path = filepath.innerHTML;
-    if (path.charAt(path.length - 1) == "*") path = path.substring(0, path.length - 1);
-    if (path == "") {
-        saveFileAs();
-        return;
-    }
-    fs.writeFile(path, code, (err) => {
-        if (err) throw err;
+    return new Promise(async (resolve, reject) => {
+        let code = editor.getModel().getValue();
+        let path = filepath.innerHTML;
+        if (path.charAt(path.length - 1) == "*") path = path.substring(0, path.length - 1);
+        if (path == "") {
+            await saveFileAs();
+            return resolve();
+        } else {
+            fs.writeFile(path, code, (err) => {
+                if (err) throw err;
+            });
+        }
+        filepath.innerHTML = path;
+        return resolve();
     });
-    filepath.innerHTML = path;
 }
 
-const loader = require('monaco-loader')
-const highlighter = require('./languages/prolescript/highlighter');
-
 var editor;
-
 loader().then((monaco) => {
     monaco.editor.defineTheme('pride', {
-        base: 'vs-dark', // can also be vs-dark or hc-black
+        base: 'vs-dark',
         rules: [
             { token: '', background: '272727' }, //Sets the background colour of the minimap
             { token: 'comment', foreground: '008800', fontStyle: 'italic' },
+            { token: 'operator', foreground: '00ffff' },
             { token: 'identifier', foreground: 'a0a0a0' },
             { token: 'type', foreground: '0088ff' },
             { token: 'string', foreground: 'aa8800' },
@@ -108,7 +121,6 @@ loader().then((monaco) => {
             { token: 'class', foreground: '00ffaa' },
             { token: 'punctuation', foreground: 'cdcdcd' },
             { token: 'keyword', foreground: '6666ee' },
-            { token: 'operator', foreground: '00ffff' },
             { token: 'invalid', foreground: 'ff3333' },
         ]
     });
@@ -163,6 +175,7 @@ loader().then((monaco) => {
                 [/[A-Za-z_][A-Za-z_0-9]*/, {
                     cases: {
                         '@typeKeywords': 'type',
+                        '@operators': 'operator',
                         '@keywords': 'keyword',
                         '@default': 'identifier'
                     }

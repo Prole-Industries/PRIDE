@@ -1,0 +1,44 @@
+//this is a translation of %PROG%/Python/BinarySearch/main.py
+
+import math;
+import time;
+import cli;
+
+func BS(ls, q, showdata, invokes){
+    invokes += 1;
+    if(showdata) { output("Invoked"); }
+    if(ls.length == 0) { return (false, invokes); }
+
+    sort(ls);
+    var midindex = math.ceil((ls.length/2)-1);
+    var low, high, mid = ls[0], ls[-1], ls[midindex];
+
+    if(showdata){
+        output($"{low} -- {mid} -- {high}");
+        output(ls);
+    }
+
+    if(q == mid) { return (true, invokes); }
+    elif(ls.length == 1){
+        return (ls[0] == q, invokes);
+    }
+    elif(ls.length == 2){
+        return (ls[0] == q or ls[1] == q, invokes);
+    }
+
+    elif(q < mid){ return BS(ls[0:midindex+1], q, showdata, invokes); }
+    elif(q > mid){ return BS(ls[midindex:-1], q, showdata, invokes); }
+}
+
+func Main(ls, q, showdata:false){
+    invokes = 0;
+    results = BS(ls, q, showdata, invokes);
+
+    if(results[0]){ output($"Search determined that the list did contain {q}"); }
+    else{ output($"Search determined that the list did not contain {q}"); }
+
+    output($"Binary search required {results[1]} invokes");
+}
+
+//This allows the Main() function to be run from command line.
+cli.attach(Main());
