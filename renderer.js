@@ -126,7 +126,8 @@ loader().then((monaco) => {
     });
 
     monaco.languages.register({ id: "prolescript" });
-    monaco.languages.setMonarchTokensProvider("prolescript", {
+    monaco.languages.setMonarchTokensProvider("prolescript", 
+    {
         defaultToken: 'invalid',
         tokenPostfix: '.prsc',
 

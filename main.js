@@ -125,14 +125,14 @@ const createWindow = () => {
                     label: "Load New Language",         //Installs a new language from a language .dll
                     accelerator: "CmdOrCtrl+L",
                     click: async () => {
-                        try {
+                        //try {
                             let path;
                             await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: "DLL", extensions: ['dll'] }] }).then((fpath) => {  //Select a .dll to load from
                                 path = fpath.filePaths[0];
                             });
                             let load = edge.func({
                                 assemblyFile: path,     //Locate the assembly that's been specified
-                                typeName: 'Main',       //The class containing the method we want to run
+                                typeName: 'Install',    //The class containing the method we want to run
                                 methodName: 'Introduce' //The method we want to run - this one returns a dictionary of metadata about the language
                             });
 
@@ -162,33 +162,40 @@ const createWindow = () => {
                                 if (!fs.existsSync(rootLangDir)) fs.mkdir(rootLangDir, (err) => { if (err) throw err; });  //If the root langauge directory doesn't exist for some reason, make it.
                                 if (!fs.existsSync(langDir)) fs.mkdir(langDir, (err) => { if (err) throw err; });
 
+                                fs.writeFile(`${langDir}/${metadata.Name}-metadata.json`, JSON.stringify({
+                                    "Name": metadata.Name,
+                                    "Description": metadata.Description,
+                                    "Version": metadata.Version,
+                                    "Designer": metadata.Designer,
+                                    "Extensions": metadata.Extensions
+                                }, null, 4), (err) => { if (err) throw err; });
+
+                                fs.copyFile(path, `${langDir}/${metadata.Name}.dll`, (err) => { if (err) throw err; });
+
                                 let getTokens = edge.func({
                                     assemblyFile: path,
-                                    typeName: 'Main',
+                                    typeName: 'Install',
                                     methodName: 'GetTokens'
                                 });
-                                console.log(getTokens);
                                 let tokens;
                                 getTokens(null, (err, res) => {
                                     if (err) throw err;
                                     else tokens = res;
                                 });
 
-                                fs.writeFile(`${langDir}/${metadata.Name}-language.json`, {
-                                    "Name": metadata.Name,
-                                    "Description": metadata.Description,
-                                    "Version": metadata.Version,
-                                    "Designer": metadata.Designer,
-                                    "Extensions": metadata.Extensions,
-                                    "Tokens": tokens,
-                                }.toString(), (err) => { if (err) throw err; });
-
-                                fs.copyFile(path, `${langDir}/${metadata.Name}.dll`, (err) => { if (err) throw err; });
+                                fs.writeFile(`${langDir}/${metadata.Name}-tokens.js`, `
+                                function getTokens()
+                                {
+                                    return { core : ${tokens}
+                                    };
+                                }
+                                module.exports = getTokens;
+                                `, (err) => { if (err) throw err; });
                             }
                             else return;
-                        } catch (e) {
-                            Alert(e);   //If anything goes wrong, tell the user
-                        }
+                        // } catch (e) {
+                        //     Alert(e);   //If anything goes wrong, tell the user
+                        // }
                     }
                 },
                 { type: "separator" },
